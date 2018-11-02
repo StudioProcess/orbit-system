@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>stp-circles</title>
+  <link rel="stylesheet" href="app/main.css">
+</head>
+<body>
+  <script src="node_modules/dat.gui/build/dat.gui.js"></script>
+  <script type="module">
+    import startup from './lib/startup.js';
+    startup({
+      'local': { src:'app/main.js', type:'module' },
+      'default': { src:'dist/bundle.js' }
+    });
+  </script>
+  <div id="help">
+    <div class="close"></div>
+    <table>
+      <tr><td>H</td><td>Show/hide this help</td></tr>
+      <!-- <tr><td>Space</td><td>Play/pause</td></tr> -->
+      <tr><td>F</td><td>Fullscreen</td></tr>
+      <tr><td>S</td><td>Save Screenshot</td></tr>
+      <tr><td>Scroll</td><td>Zoom</td></tr>
+      <tr><td>Left MB</td><td>Rotate</td></tr>
+      <tr><td>Right MB</td><td>Pan</td></tr>
+      <!-- <tr><td>1, 2, 3</td><td>Color Modes</td></tr> -->
+    </table>
+  </div>
+</body>
+</html>
