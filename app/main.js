@@ -74,7 +74,7 @@ function setup() {
   camera.rotation.z = 0;
   controls = new THREE.OrbitControls( camera, renderer.domElement );
 
-  gui.create();
+  // gui.create();
 
   createElements();
   // connectElements(1, 2);
@@ -234,6 +234,8 @@ function loop(time) { // eslint-disable-line no-unused-vars
   clock.update(time);
   time = clock.time();
   // console.log(time);
+
+  camera.rotation.z = Math.sin(time * 0.0001) * 0.01;
 
 
   // for(let i = 0; i < numberElements; i++) {
