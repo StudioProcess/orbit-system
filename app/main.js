@@ -10,13 +10,25 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 150;
+let numberElements = 300;
 let elementSize = 0.3;
-let radiusScale = 0.6;
-let yRange = 0.0;
+let radiusScale = 0.4;
+let maxRadius = 4;
+let yRange = 0.2;
+
+let rotationSpeedScale = 0.0010;
 // let colors = [];
 // let offset = 0.2;
 // let t = 0.1;
+
+var planetColors = [
+    0x0885c2,
+    // 0xfbb132,
+    0x666666,
+    // 0x1c8b3c,
+    // 0xed334e
+  ],
+  planets = [];
 
 export let params = {
   bgColor: '#606060',
@@ -64,6 +76,9 @@ function setup() {
 
   gui.create();
 
+  createElements();
+  // connectElements(1, 2);
+
   // colors = [0xFFFFFF];
   // for(let i = 0; i < numberElements; i++) {
   //   let mat = new THREE.MeshBasicMaterial({
@@ -80,6 +95,49 @@ function setup() {
   // console.log( elements );
 }
 
+export function createElements(){
+  for (var p = 0, radii = 0; p < numberElements; p++) {
+    var size = elementSize,// Math.random() * 2,
+      type = Math.floor(Math.random() * planetColors.length),
+      roughness = Math.random() > .6 ? 1 : 0,
+      planetGeom = new THREE.Mesh(
+        // new THREE.BoxGeometry( elementSize, roughness, roughness ),
+        new THREE.SphereGeometry( Math.random() * elementSize, Math.random() * elementSize*3, Math.random() * elementSize ),
+        // new THREE.RingBufferGeometry(
+        //   Math.random() * elementSize,
+        //   Math.random() * elementSize,
+        //   Math.random() * elementSize
+        // ),
+        // new THREE.ConeBufferGeometry( Math.random() * elementSize, roughness),
+        new THREE.MeshBasicMaterial({
+          color: planetColors[type],
+          // shading: THREE.FlatShading,
+          wireframe: false,
+          // transparent: true,
+          // opacity: 0.8,
+          blending: THREE.MultiplyBlending
+        })
+      ),
+      planet = new THREE.Object3D();
+
+    planet.add(planetGeom);
+
+    // planet.orbitRadius = radiusScale;
+    planet.orbitRadius = ( getRandomFloat(0, maxRadius) + radii );
+    // if(p%2==0){ planet.orbitRadius += Math.random() + radii; }  //Math.random() * 2 + 2 + radii;
+    planet.rotSpeed = getRandomInt(-5, 5) * rotationSpeedScale;
+    // planet.rotSpeed *= Math.random() < .10 ? -1 : 1;
+    planet.rot = Math.random();
+    // planet.orbitSpeed = (0.02 - p * 0.0048) * 0.005;
+    planet.orbitSpeed = Math.random() * (0.02 - 0.0048) * 0.009;
+    planet.orbit = Math.random() * Math.PI * 2;
+    planet.position.set(planet.orbitRadius, 0, 0);
+
+    radii = (planet.orbitRadius + size) * radiusScale;
+    planets.push(planet);
+    scene.add(planet);
+
+}
 
 ////
 
@@ -103,51 +161,6 @@ var starColor = (function() {
 // star.castShadow = false;
 // scene.add(star);
 
-var planetColors = [
-    0x0885c2,
-    0xfbb132,
-    0x666666,
-    0x1c8b3c,
-    0xed334e
-  ],
-  planets = [];
-
-for (var p = 0, radii = 0; p < numberElements; p++) {
-  var size = elementSize,// Math.random() * 2,
-    type = Math.floor(Math.random() * planetColors.length),
-    roughness = Math.random() > .6 ? 1 : 0,
-    planetGeom = new THREE.Mesh(
-      // new THREE.BoxGeometry( elementSize, roughness, roughness ),
-      new THREE.BoxGeometry( Math.random() * elementSize, Math.random() * elementSize, Math.random() * elementSize ),
-      // new THREE.IcosahedronGeometry(size, roughness),
-      new THREE.MeshBasicMaterial({
-        color: planetColors[type],
-        // shading: THREE.FlatShading,
-        wireframe: false,
-        // transparent: true,
-        // opacity: 0.8,
-        blending: THREE.MultiplyBlending
-      })
-    ),
-    planet = new THREE.Object3D();
-
-  planet.add(planetGeom);
-
-  // planet.orbitRadius = radiusScale;
-  planet.orbitRadius = (Math.random() + radii) * radiusScale;
-  // if(p%2==0){ planet.orbitRadius += Math.random() + radii; }  //Math.random() * 2 + 2 + radii;
-  planet.rotSpeed = getRandomInt(-5, 5) * 0.0003;
-  // planet.rotSpeed *= Math.random() < .10 ? -1 : 1;
-  planet.rot = Math.random();
-  // planet.orbitSpeed = (0.02 - p * 0.0048) * 0.005;
-  planet.orbitSpeed = Math.random() * (0.02 - 0.0048) * 0.009;
-  planet.orbit = Math.random() * Math.PI * 2;
-  planet.position.set(planet.orbitRadius, 0, 0);
-
-  radii = planet.orbitRadius + size;
-  planets.push(planet);
-  scene.add(planet);
-
   // orbit line
   // var orbit = new THREE.Line(
   //   new THREE.CircleGeometry(planet.orbitRadius, 90),
@@ -164,6 +177,44 @@ for (var p = 0, radii = 0; p < numberElements; p++) {
 }
 ////
 
+export function connectElements(num1, num2) {
+  let planet1 = new THREE.Object3D();
+  let planet2 = new THREE.Object3D();
+
+  // console.log( planets );
+
+  planet1 = planets[num1];
+  planet2 = planets[num2];
+
+  // var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 20, 32 );
+  // let material = new THREE.MeshBasicMaterial({
+  //   color: '#ff0000',
+  //   wireframe: false,
+  //   blending: THREE.MultiplyBlending
+  // });
+
+  // var cylinder = new THREE.Mesh( geometry, material );
+  var path = new THREE.Path();
+
+  path.lineTo( planet1.position.x, planet1.position.y, planet1.position.z );
+	// path.quadraticCurveTo( 0, 1, 0.2, 1 );
+	path.lineTo( planet2.position.x, planet2.position.y, planet2.position.z );
+  var points = path.getPoints();
+
+  var geometry = new THREE.BufferGeometry().setFromPoints( points );
+	var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+  var line = new THREE.Line( geometry, material );
+	scene.add( line );
+
+  // console.log( planet1 );
+  // if( planet1 && planet2 ){
+  //   cylinder.position.set(planet1.position.x, planet1.position.y, planet1.position.z);
+  //   cylinder.rotation.x = 1.5708;
+  //   scene.add( cylinder );
+  // }
+}
+
+
 export function setBackgroundColor(col) {
   renderer.setClearColor(col);
   //document.querySelector('canvas').style.backgroundColor = col;
@@ -175,10 +226,15 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
 }
 
+function getRandomFloat(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
 function loop(time) { // eslint-disable-line no-unused-vars
   clock.update(time);
   time = clock.time();
   // console.log(time);
+
 
   // for(let i = 0; i < numberElements; i++) {
   //   elements[i].position.x = Math.sin( (i+1)*time/20000 ) + offset ;
@@ -194,11 +250,14 @@ function loop(time) { // eslint-disable-line no-unused-vars
     planet.orbit += planet.orbitSpeed;
     planet.position.set(
       Math.cos(planet.orbit) * planet.orbitRadius,
-      //Math.tan(planet.orbit) * planet.orbitRadius,
-      params.yRanges[p],
+      // Math.tan(planet.orbit) * planet.orbitRadius,
+      Math.cos(params.yRanges[p] * time*0.01) * 0.1,
       //0,//Math.cos(planet.orbit) * planet.orbitRadius + Math.sin(planet.orbit),
       Math.sin(planet.orbit) * planet.orbitRadius);
   }
+
+  console.log( params.yRanges[p] + Math.sin(time) * 0.1 );
+  // connectElements(1, 2);
 
   requestAnimationFrame( loop );
   renderer.render( scene, camera );
