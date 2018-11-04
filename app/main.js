@@ -10,12 +10,14 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 300;
-let elementSize = 0.3;
+let numberElements = 3000;
+let elementSize = 0.2;
 let radiusScale = 0.4;
-let maxRadius = 4;
+let maxRadius = 8;
 let yRange = 0.2;
+let showOrbitLines = false;
 
+let orbitSpeed = 1;
 let rotationSpeedScale = 0.0010;
 // let colors = [];
 // let offset = 0.2;
@@ -129,7 +131,7 @@ export function createElements(){
     // planet.rotSpeed *= Math.random() < .10 ? -1 : 1;
     planet.rot = Math.random();
     // planet.orbitSpeed = (0.02 - p * 0.0048) * 0.005;
-    planet.orbitSpeed = Math.random() * (0.02 - 0.0048) * 0.009;
+    planet.orbitSpeed = Math.random() * (0.02 - 0.0048) * 0.009 * orbitSpeed;
     planet.orbit = Math.random() * Math.PI * 2;
     planet.position.set(planet.orbitRadius, 0, 0);
 
@@ -137,15 +139,30 @@ export function createElements(){
     planets.push(planet);
     scene.add(planet);
 
-}
+    // orbit line
+    if(showOrbitLines) {
+      var orbit = new THREE.Line(
+        new THREE.CircleGeometry(planet.orbitRadius, 90),
+        new THREE.MeshBasicMaterial({
+          color: planetColors[0],
+          transparent: true,
+          opacity: 1,
+          side: THREE.BackSide
+        })
+      );
+      orbit.geometry.vertices.shift();
+      orbit.rotation.x = THREE.Math.degToRad(90);
+      scene.add(orbit);
+    }
+  }
 
-////
+  ////
 
-//Objects
-var starColor = (function() {
-  var colors = [0x0885c2, 0xfbb132, 0x666666, 0x1c8b3c, 0xed334e]; //[0xFFFF00, 0x559999, 0xFF6339, 0xFFFFFF];
-  return colors[Math.floor(Math.random() * colors.length)];
-})();
+  //Objects
+  var starColor = (function() {
+    var colors = [0x0885c2, 0xfbb132, 0x666666, 0x1c8b3c, 0xed334e]; //[0xFFFF00, 0x559999, 0xFF6339, 0xFFFFFF];
+    return colors[Math.floor(Math.random() * colors.length)];
+  })();
   // star = new THREE.Mesh(
   //   // new THREE.IcosahedronGeometry(0.3, 1),
   //   new THREE.SphereGeometry( elementSize, 20, 20 ),
@@ -160,20 +177,6 @@ var starColor = (function() {
 
 // star.castShadow = false;
 // scene.add(star);
-
-  // orbit line
-  // var orbit = new THREE.Line(
-  //   new THREE.CircleGeometry(planet.orbitRadius, 90),
-  //   new THREE.MeshBasicMaterial({
-  //     color: 0xed334e,
-  //     transparent: true,
-  //     opacity: 0.1,
-  //     side: THREE.BackSide
-  //   })
-  // );
-  // orbit.geometry.vertices.shift();
-  // orbit.rotation.x = THREE.Math.degToRad(90);
-  // scene.add(orbit);
 }
 ////
 
@@ -197,14 +200,14 @@ export function connectElements(num1, num2) {
   var path = new THREE.Path();
 
   path.lineTo( planet1.position.x, planet1.position.y, planet1.position.z );
-	// path.quadraticCurveTo( 0, 1, 0.2, 1 );
-	path.lineTo( planet2.position.x, planet2.position.y, planet2.position.z );
+  // path.quadraticCurveTo( 0, 1, 0.2, 1 );
+  path.lineTo( planet2.position.x, planet2.position.y, planet2.position.z );
   var points = path.getPoints();
 
   var geometry = new THREE.BufferGeometry().setFromPoints( points );
-	var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
+  var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
   var line = new THREE.Line( geometry, material );
-	scene.add( line );
+  scene.add( line );
 
   // console.log( planet1 );
   // if( planet1 && planet2 ){
