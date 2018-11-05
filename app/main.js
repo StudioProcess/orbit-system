@@ -10,7 +10,7 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 20;
+let numberElements = 200;
 let elementSize = 0.2;
 let radiusScale = 0.4;
 let maxRadius = 8;
