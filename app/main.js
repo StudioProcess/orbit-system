@@ -119,8 +119,8 @@ export function createElements(){
       new THREE.MeshPhongMaterial({
         color: layerColors[0],
         wireframe: false,
-        specular: 0xff0000,
-        shininess: 100,
+        specular: 0xffffff,
+        shininess: 1,
         blending: THREE.MultiplyBlending
       })
     );
@@ -134,8 +134,8 @@ export function createElements(){
       new THREE.MeshPhongMaterial({
         color: layerColors[1],
         wireframe: false,
-        specular: 0xff0000,
-        shininess: 100,
+        specular: 0xffffff,
+        shininess: 1,
         blending: THREE.MultiplyBlending
       })
     );
@@ -149,8 +149,8 @@ export function createElements(){
       new THREE.MeshPhongMaterial({
         color: layerColors[2],
         wireframe: false,
-        specular: 0xff0000,
-        shininess: 100,
+        specular: 0xffffff,
+        shininess: 1,
         blending: THREE.MultiplyBlending
       })
     );
