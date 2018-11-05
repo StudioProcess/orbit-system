@@ -10,23 +10,29 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 3000;
+let numberElements = 20;
 let elementSize = 0.2;
 let radiusScale = 0.4;
 let maxRadius = 8;
 let yRange = 0.2;
 let showOrbitLines = false;
 
-let orbitSpeed = 1;
+let orbitSpeed = 2;
 let rotationSpeedScale = 0.0010;
+let light;
 // let colors = [];
 // let offset = 0.2;
 // let t = 0.1;
 
+//
+let r = 1;
+let theta = 0;
+let dTheta = 2 * Math.PI / 1000;
+
 var planetColors = [
     0x0885c2,
     // 0xfbb132,
-    0x666666,
+    // 0x666666,
     // 0x1c8b3c,
     // 0xed334e
   ],
@@ -65,7 +71,7 @@ function setup() {
   document.body.appendChild( renderer.domElement );
 
   scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
+  // camera = new THREE.PerspectiveCamera( 75, W / H, 0.01, 1000 );
   var aspect = W / H;
   var d = 3; // camera distance
   camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 10000 );
@@ -77,6 +83,8 @@ function setup() {
   controls = new THREE.OrbitControls( camera, renderer.domElement );
 
   // gui.create();
+
+  addLights();
 
   createElements();
   // connectElements(1, 2);
@@ -97,6 +105,20 @@ function setup() {
   // console.log( elements );
 }
 
+function addLights(){
+  // light = new THREE.DirectionalLight( 0xFFFFFF );
+  // var helper = new THREE.DirectionalLightHelper( light, 1, 0xff0000 );
+
+  light = new THREE.DirectionalLight( 0xFFFFFF, 1 );
+  light.position.set( 0, 0, 0 );
+  // light.angle = 0.04;
+  light.distance = 2;
+  scene.add( light );
+
+  // var spotLightHelper = new THREE.DirectionalLightHelper( light, 5, 0xff0000 );
+  // scene.add( spotLightHelper );
+}
+
 export function createElements(){
   for (var p = 0, radii = 0; p < numberElements; p++) {
     var size = elementSize,// Math.random() * 2,
@@ -104,19 +126,21 @@ export function createElements(){
       roughness = Math.random() > .6 ? 1 : 0,
       planetGeom = new THREE.Mesh(
         // new THREE.BoxGeometry( elementSize, roughness, roughness ),
-        new THREE.SphereGeometry( Math.random() * elementSize, Math.random() * elementSize*3, Math.random() * elementSize ),
+        new THREE.SphereBufferGeometry( Math.random() * elementSize, elementSize*3, elementSize*3 ),
         // new THREE.RingBufferGeometry(
         //   Math.random() * elementSize,
         //   Math.random() * elementSize,
         //   Math.random() * elementSize
         // ),
         // new THREE.ConeBufferGeometry( Math.random() * elementSize, roughness),
-        new THREE.MeshBasicMaterial({
+        new THREE.MeshPhongMaterial({
           color: planetColors[type],
-          // shading: THREE.FlatShading,
+          shading: THREE.FlatShading,
           wireframe: false,
+          specular: 0xff0000,
           // transparent: true,
           // opacity: 0.8,
+          shininess: 100,
           blending: THREE.MultiplyBlending
         })
       ),
@@ -261,7 +285,17 @@ function loop(time) { // eslint-disable-line no-unused-vars
       Math.sin(planet.orbit) * planet.orbitRadius);
   }
 
-  console.log( params.yRanges[p] + Math.sin(time) * 0.1 );
+  //Increment theta, and update moon x and y
+  //position based off new theta value
+  theta += dTheta;
+  light.position.x = r * Math.cos(theta);
+  light.position.y = 0;
+  light.position.z = r * Math.sin(theta);
+
+  // light.target.position.x = 1;//( Math.cos(time) * 10.1 );
+  // light.target.position.y = 1;//( Math.cos(time) * 10.1 );
+  // light.target.position.z = 5;//( Math.cos(time) * 10.1 );
+
   // connectElements(1, 2);
 
   requestAnimationFrame( loop );
