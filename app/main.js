@@ -10,7 +10,7 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 200;
+let numberElements = 5;
 let elementSize = 0.2;
 let radiusScale = 0.4;
 let maxRadius = 8;
@@ -24,19 +24,30 @@ let light;
 // let offset = 0.2;
 // let t = 0.1;
 
+let radius1 = 1;
+let radius2 = 2;
+let radius3 = 3;
+
+let elementsLayer1 = 2;
+let elementsLayer2 = 2;
+let elementsLayer3 = 2;
+
+let layer1 = [];
+let layer2 = [];
+let layer3 = [];
+
 //
 let r = 1;
 let theta = 0;
 let dTheta = 2 * Math.PI / 1000;
 
-var planetColors = [
+var layerColors = [
     0x0885c2,
-    // 0xfbb132,
-    // 0x666666,
-    // 0x1c8b3c,
-    // 0xed334e
-  ],
-  planets = [];
+    0xfbb132,
+    0x666666,
+    0x1c8b3c,
+    0xed334e
+  ];
 
 export let params = {
   bgColor: '#606060',
@@ -87,22 +98,6 @@ function setup() {
   addLights();
 
   createElements();
-  // connectElements(1, 2);
-
-  // colors = [0xFFFFFF];
-  // for(let i = 0; i < numberElements; i++) {
-  //   let mat = new THREE.MeshBasicMaterial({
-  //     color: colors[i%colors.length],
-  //     wireframe: false,
-  //     transparent: true,
-  //     opacity: 0.8,
-  //     // blending: THREE.MultiplyBlending
-  //   });
-  //   let mesh = new THREE.Mesh( new THREE.SphereGeometry( 0.1, 20, 20 ), mat );
-  //   elements.push( mesh );
-  //   scene.add( mesh );
-  // }
-  // console.log( elements );
 }
 
 function addLights(){
@@ -114,137 +109,60 @@ function addLights(){
   // light.angle = 0.04;
   light.distance = 2;
   scene.add( light );
-
-  // var spotLightHelper = new THREE.DirectionalLightHelper( light, 5, 0xff0000 );
-  // scene.add( spotLightHelper );
 }
 
 export function createElements(){
-  for (var p = 0, radii = 0; p < numberElements; p++) {
-    var size = elementSize,// Math.random() * 2,
-      type = Math.floor(Math.random() * planetColors.length),
-      roughness = Math.random() > .6 ? 1 : 0,
-      planetGeom = new THREE.Mesh(
-        // new THREE.BoxGeometry( elementSize, roughness, roughness ),
-        new THREE.SphereBufferGeometry( Math.random() * elementSize, elementSize*3, elementSize*3 ),
-        // new THREE.RingBufferGeometry(
-        //   Math.random() * elementSize,
-        //   Math.random() * elementSize,
-        //   Math.random() * elementSize
-        // ),
-        // new THREE.ConeBufferGeometry( Math.random() * elementSize, roughness),
-        new THREE.MeshPhongMaterial({
-          color: planetColors[type],
-          shading: THREE.FlatShading,
-          wireframe: false,
-          specular: 0xff0000,
-          // transparent: true,
-          // opacity: 0.8,
-          shininess: 100,
-          blending: THREE.MultiplyBlending
-        })
-      ),
-      planet = new THREE.Object3D();
 
-    planet.add(planetGeom);
-
-    // planet.orbitRadius = radiusScale;
-    planet.orbitRadius = ( getRandomFloat(0, maxRadius) + radii );
-    // if(p%2==0){ planet.orbitRadius += Math.random() + radii; }  //Math.random() * 2 + 2 + radii;
-    planet.rotSpeed = getRandomInt(-5, 5) * rotationSpeedScale;
-    // planet.rotSpeed *= Math.random() < .10 ? -1 : 1;
-    planet.rot = Math.random();
-    // planet.orbitSpeed = (0.02 - p * 0.0048) * 0.005;
-    planet.orbitSpeed = Math.random() * (0.02 - 0.0048) * 0.009 * orbitSpeed;
-    planet.orbit = Math.random() * Math.PI * 2;
-    planet.position.set(planet.orbitRadius, 0, 0);
-
-    radii = (planet.orbitRadius + size) * radiusScale;
-    planets.push(planet);
-    scene.add(planet);
-
-    // orbit line
-    if(showOrbitLines) {
-      var orbit = new THREE.Line(
-        new THREE.CircleGeometry(planet.orbitRadius, 90),
-        new THREE.MeshBasicMaterial({
-          color: planetColors[0],
-          transparent: true,
-          opacity: 1,
-          side: THREE.BackSide
-        })
-      );
-      orbit.geometry.vertices.shift();
-      orbit.rotation.x = THREE.Math.degToRad(90);
-      scene.add(orbit);
-    }
+  for(let i=0; i < elementsLayer1; i++) {
+    let planetGeom = new THREE.Mesh(
+      new THREE.SphereBufferGeometry( Math.random() * elementSize, elementSize*3, elementSize*3 ),
+      new THREE.MeshPhongMaterial({
+        color: layerColors[0],
+        wireframe: false,
+        specular: 0xff0000,
+        shininess: 100,
+        blending: THREE.MultiplyBlending
+      })
+    );
+    layer1.push( planetGeom );
+    scene.add( planetGeom );
   }
 
-  ////
+  for(let i=0; i < elementsLayer2; i++) {
+    let planetGeom = new THREE.Mesh(
+      new THREE.SphereBufferGeometry( Math.random() * elementSize, elementSize*3, elementSize*3 ),
+      new THREE.MeshPhongMaterial({
+        color: layerColors[1],
+        wireframe: false,
+        specular: 0xff0000,
+        shininess: 100,
+        blending: THREE.MultiplyBlending
+      })
+    );
+    layer2.push( planetGeom );
+    scene.add( planetGeom );
+  }
 
-  //Objects
-  var starColor = (function() {
-    var colors = [0x0885c2, 0xfbb132, 0x666666, 0x1c8b3c, 0xed334e]; //[0xFFFF00, 0x559999, 0xFF6339, 0xFFFFFF];
-    return colors[Math.floor(Math.random() * colors.length)];
-  })();
-  // star = new THREE.Mesh(
-  //   // new THREE.IcosahedronGeometry(0.3, 1),
-  //   new THREE.SphereGeometry( elementSize, 20, 20 ),
-  //   new THREE.MeshBasicMaterial({
-  //     color: 0x0885c2,
-  //     wireframe: false,
-  //     transparent: true,
-  //     opacity: 1,
-  //     // blending: THREE.MultiplyBlending
-  //   })
-  // );
+  for(let i=0; i < elementsLayer3; i++) {
+    let planetGeom = new THREE.Mesh(
+      new THREE.SphereBufferGeometry( Math.random() * elementSize, elementSize*3, elementSize*3 ),
+      new THREE.MeshPhongMaterial({
+        color: layerColors[2],
+        wireframe: false,
+        specular: 0xff0000,
+        shininess: 100,
+        blending: THREE.MultiplyBlending
+      })
+    );
+    layer3.push( planetGeom );
+    scene.add( planetGeom );
+  }
 
-// star.castShadow = false;
-// scene.add(star);
-}
-////
-
-export function connectElements(num1, num2) {
-  let planet1 = new THREE.Object3D();
-  let planet2 = new THREE.Object3D();
-
-  // console.log( planets );
-
-  planet1 = planets[num1];
-  planet2 = planets[num2];
-
-  // var geometry = new THREE.CylinderBufferGeometry( 0.1, 0.1, 20, 32 );
-  // let material = new THREE.MeshBasicMaterial({
-  //   color: '#ff0000',
-  //   wireframe: false,
-  //   blending: THREE.MultiplyBlending
-  // });
-
-  // var cylinder = new THREE.Mesh( geometry, material );
-  var path = new THREE.Path();
-
-  path.lineTo( planet1.position.x, planet1.position.y, planet1.position.z );
-  // path.quadraticCurveTo( 0, 1, 0.2, 1 );
-  path.lineTo( planet2.position.x, planet2.position.y, planet2.position.z );
-  var points = path.getPoints();
-
-  var geometry = new THREE.BufferGeometry().setFromPoints( points );
-  var material = new THREE.LineBasicMaterial( { color: 0xff0000 } );
-  var line = new THREE.Line( geometry, material );
-  scene.add( line );
-
-  // console.log( planet1 );
-  // if( planet1 && planet2 ){
-  //   cylinder.position.set(planet1.position.x, planet1.position.y, planet1.position.z);
-  //   cylinder.rotation.x = 1.5708;
-  //   scene.add( cylinder );
-  // }
 }
 
 
 export function setBackgroundColor(col) {
   renderer.setClearColor(col);
-  //document.querySelector('canvas').style.backgroundColor = col;
 }
 
 function getRandomInt(min, max) {
@@ -260,43 +178,43 @@ function getRandomFloat(min, max) {
 function loop(time) { // eslint-disable-line no-unused-vars
   clock.update(time);
   time = clock.time();
-  // console.log(time);
+  theta += dTheta;
 
-  camera.rotation.z = Math.sin(time * 0.0001) * 0.01;
+  // camera.rotation.z = Math.sin(time * 0.0001) * 0.01;
 
-
-  // for(let i = 0; i < numberElements; i++) {
-  //   elements[i].position.x = Math.sin( (i+1)*time/20000 ) + offset ;
-  //   elements[i].position.y = Math.cos( (i+1)*time/20000 ) + offset;
-  //   elements[i].position.z = 0 ;//1-(i*0.5);
-  // }
-
-  ////
-  for (var p in planets) {
-    var planet = planets[p];
-    planet.rot += planet.rotSpeed;
-    planet.rotation.set(0, planet.rot, 0);
-    planet.orbit += planet.orbitSpeed;
+  for (var p in layer1) {
+    var planet = layer1[p];
     planet.position.set(
-      Math.cos(planet.orbit) * planet.orbitRadius,
-      // Math.tan(planet.orbit) * planet.orbitRadius,
-      Math.cos(params.yRanges[p] * time*0.01) * 0.1,
-      //0,//Math.cos(planet.orbit) * planet.orbitRadius + Math.sin(planet.orbit),
-      Math.sin(planet.orbit) * planet.orbitRadius);
+      radius1 * Math.cos(theta * (2/(p+1))),
+      0,
+      radius1 * Math.sin(theta * (2/(p+1)))
+    );
   }
+
+  for (var i in layer2) {
+    var planet2 = layer2[i];
+    planet2.position.set(
+      radius2 * Math.cos(theta * (2/(i+1))),
+      0,
+      radius2 * Math.sin(theta * (2/(i+1)))
+    );
+  }
+
+  for (var u in layer3) {
+    var planet3 = layer3[u];
+    planet3.position.set(
+      radius3 * Math.cos(theta * (2/(u+1))),
+      0,
+      radius3 * Math.sin(theta * (2/(u+1)))
+    );
+  }
+
 
   //Increment theta, and update moon x and y
   //position based off new theta value
-  theta += dTheta;
   light.position.x = r * Math.cos(theta);
   light.position.y = 0;
   light.position.z = r * Math.sin(theta);
-
-  // light.target.position.x = 1;//( Math.cos(time) * 10.1 );
-  // light.target.position.y = 1;//( Math.cos(time) * 10.1 );
-  // light.target.position.z = 5;//( Math.cos(time) * 10.1 );
-
-  // connectElements(1, 2);
 
   requestAnimationFrame( loop );
   renderer.render( scene, camera );
