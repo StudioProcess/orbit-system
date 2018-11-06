@@ -24,8 +24,8 @@ let light;
 // let offset = 0.2;
 // let t = 0.1;
 
-let radius1 = 1;
-let radius2 = 2;
+let radius1 = 2.3;
+let radius2 = 2.6;
 let radius3 = 3;
 
 let elementsLayer1 = 2;
@@ -117,6 +117,22 @@ function setup() {
   createConnections();
 }
 
+function cylinderMesh(point1, point2, material) {
+  // edge from X to Y
+    var direction = new THREE.Vector3().subVectors( point2, point1 );
+    var arrow = new THREE.ArrowHelper( direction, point1 );
+
+    // cylinder: radiusAtTop, radiusAtBottom,
+    //     height, radiusSegments, heightSegments
+    var edgeGeometry = new THREE.CylinderGeometry( 2, 2, direction.length(), 6, 4 );
+
+    var edge = new THREE.Mesh( edgeGeometry,
+        new THREE.MeshBasicMaterial( { color: 0x0000ff } ) );
+    edge.rotation = arrow.rotation.clone();
+    edge.position = new THREE.Vector3().addVectors( point1, direction.multiplyScalar(0.5) );
+    return edge;
+}
+
 function createConnections(){
   // layer 1
   var x1 = layer1[0].position.x;
@@ -126,6 +142,9 @@ function createConnections(){
   var x2 = layer1[1].position.x;
   var y2 = layer1[1].position.y;
   var z2 = layer1[1].position.z;
+
+  var point1 = new THREE.Vector3( x1, y1, z1);
+  var point2 = new THREE.Vector3( x2, y2, z2);
 
   var geometry = new THREE.Geometry();
 
@@ -137,6 +156,16 @@ function createConnections(){
   var material = new THREE.LineBasicMaterial({
     color: 0x0000ff
   });
+
+  // var cyl = cylinderMesh(point1, point2, material);
+
+  var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 4), material);
+  var focalPoint = point2;
+  cylinder.up = new THREE.Vector3(0,0,1);//Z axis up
+  cylinder.lookAt(focalPoint);
+  cylinder.name = "cylinder1";
+
+  scene.add( cylinder );
 
   var line = new THREE.Line( geometry, material );
   line.name = "line";
@@ -213,6 +242,9 @@ function updateConnections(){
 
   var geometryNew = new THREE.Geometry();
 
+  var pointA = new THREE.Vector3( x1, y1, z1 );
+  var pointB = new THREE.Vector3( x2, y2, z2 );
+
   geometryNew.vertices.push(
     new THREE.Vector3( x1, y1, z1 ),
     new THREE.Vector3( x2, y2, z2 )
@@ -220,6 +252,22 @@ function updateConnections(){
 
   var lineNew = new THREE.Line( geometryNew, material );
   lineNew.name = "line";
+
+  var selectedCylinder = scene.getObjectByName( "cylinder1" );
+  // console.log( selectedObject.position.x );
+  scene.remove( selectedCylinder );
+
+// a.distanceTo( b );
+  var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1,  pointA.distanceTo( pointB )), material);
+  cylinder.position.x = (pointA.x + pointB.x)/2;
+  cylinder.position.z = (pointA.z + pointB.z)/2;
+  // cylinder.rotation.set(new THREE.Vector3( 0, Math.PI / 2, 0));
+  var focalPoint = new THREE.Vector3( x2, y2, z2 );
+  cylinder.up = new THREE.Vector3(1,0,1);//Z axis up
+  cylinder.lookAt(focalPoint);
+  cylinder.name = "cylinder1";
+
+  scene.add( cylinder );
 
   scene.add( lineNew );
 
