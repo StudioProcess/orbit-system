@@ -36,10 +36,15 @@ let layer1 = [];
 let layer2 = [];
 let layer3 = [];
 
+let lineWidth = 3;
+
 //
 let r = 1;
 let theta = 0;
 let dTheta = 2 * Math.PI / 1000;
+
+var millisInMinute = Date.now() % 60000;
+var millisInMinuteNormalized = millisInMinute / 60000;
 
 var layerColors = [
     0x0885c2,
@@ -62,6 +67,16 @@ export let params = {
 
 })();
 
+
+function orbitCalculation(radius, speed) {
+  return {x: (Math.sin((Date.now()%60000)/60000 * Math.PI * 2 * speed) * radius),
+    z: (Math.cos((Date.now()%60000)/60000 * Math.PI * 2 * speed) * radius)};
+}
+
+function orbitCalculation2(radius, speed) {
+  return {x: (Math.sin((Date.now()%60000)/50000 * Math.PI * 2 * speed) * radius),
+    z: (Math.cos((Date.now()%60000)/50000 * Math.PI * 2 * speed) * radius)};
+}
 
 function setup() {
 
@@ -98,6 +113,175 @@ function setup() {
   addLights();
 
   createElements();
+
+  createConnections();
+}
+
+function createConnections(){
+  // layer 1
+  var x1 = layer1[0].position.x;
+  var y1 = layer1[0].position.y;
+  var z1 = layer1[0].position.z;
+
+  var x2 = layer1[1].position.x;
+  var y2 = layer1[1].position.y;
+  var z2 = layer1[1].position.z;
+
+  var geometry = new THREE.Geometry();
+
+  geometry.vertices.push(
+    new THREE.Vector3( x1, y1, z1 ),
+    new THREE.Vector3( x2, y2, z2 )
+  );
+
+  var material = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var line = new THREE.Line( geometry, material );
+  line.name = "line";
+  scene.add( line );
+
+  // layer 2
+  var x3 = layer2[0].position.x;
+  var y3 = layer2[0].position.y;
+  var z3 = layer2[0].position.z;
+
+  var x4 = layer2[1].position.x;
+  var y4 = layer2[1].position.y;
+  var z4 = layer2[1].position.z;
+
+  var geometry2 = new THREE.Geometry();
+
+  geometry2.vertices.push(
+    new THREE.Vector3( x3, y3, z3 ),
+    new THREE.Vector3( x4, y4, z4 )
+  );
+
+  var material2 = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var line2 = new THREE.Line( geometry2, material2 );
+  line2.name = "line2";
+  scene.add( line2 );
+
+
+  // layer 3
+  var x5 = layer3[0].position.x;
+  var y5 = layer3[0].position.y;
+  var z5 = layer3[0].position.z;
+
+  var x6 = layer3[1].position.x;
+  var y6 = layer3[1].position.y;
+  var z6 = layer3[1].position.z;
+
+  var geometry3 = new THREE.Geometry();
+
+  geometry3.vertices.push(
+    new THREE.Vector3( x5, y5, z5 ),
+    new THREE.Vector3( x6, y6, z6 )
+  );
+
+  var material3 = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var line3 = new THREE.Line( geometry3, material3 );
+  line3.name = "line3";
+  scene.add( line3 );
+
+}
+
+function updateConnections(){
+  // layer 1
+  var x1 = layer1[0].position.x;
+  var y1 = layer1[0].position.y;
+  var z1 = layer1[0].position.z;
+
+  var x2 = layer1[1].position.x;
+  var y2 = layer1[1].position.y;
+  var z2 = layer1[1].position.z;
+
+  var material = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var selectedObject = scene.getObjectByName( "line" );
+  // console.log( selectedObject.position.x );
+  scene.remove( selectedObject );
+
+  var geometryNew = new THREE.Geometry();
+
+  geometryNew.vertices.push(
+    new THREE.Vector3( x1, y1, z1 ),
+    new THREE.Vector3( x2, y2, z2 )
+  );
+
+  var lineNew = new THREE.Line( geometryNew, material );
+  lineNew.name = "line";
+
+  scene.add( lineNew );
+
+  // layer 2
+  var x3 = layer2[0].position.x;
+  var y3 = layer2[0].position.y;
+  var z3 = layer2[0].position.z;
+
+  var x4 = layer2[1].position.x;
+  var y4 = layer2[1].position.y;
+  var z4 = layer2[1].position.z;
+
+  var material2 = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var selectedObject2 = scene.getObjectByName( "line2" );
+  // console.log( selectedObject.position.x );
+  scene.remove( selectedObject2 );
+
+  var geometryNew2 = new THREE.Geometry();
+
+  geometryNew2.vertices.push(
+    new THREE.Vector3( x3, y3, z3 ),
+    new THREE.Vector3( x4, y4, z4 )
+  );
+
+  var lineNew2 = new THREE.Line( geometryNew2, material2 );
+  lineNew2.name = "line2";
+
+  scene.add( lineNew2 );
+
+
+  // layer 2
+  var x5 = layer3[0].position.x;
+  var y5 = layer3[0].position.y;
+  var z5 = layer3[0].position.z;
+
+  var x6 = layer3[1].position.x;
+  var y6 = layer3[1].position.y;
+  var z6 = layer3[1].position.z;
+
+  var material3 = new THREE.LineBasicMaterial({
+    color: 0x0000ff
+  });
+
+  var selectedObject3 = scene.getObjectByName( "line3" );
+  // console.log( selectedObject.position.x );
+  scene.remove( selectedObject3 );
+
+  var geometryNew3 = new THREE.Geometry();
+
+  geometryNew3.vertices.push(
+    new THREE.Vector3( x5, y5, z5 ),
+    new THREE.Vector3( x6, y6, z6 )
+  );
+
+  var lineNew3 = new THREE.Line( geometryNew3, material3 );
+  lineNew3.name = "line3";
+
+  scene.add( lineNew3 );
+
 }
 
 function addLights(){
@@ -157,7 +341,6 @@ export function createElements(){
     layer3.push( planetGeom );
     scene.add( planetGeom );
   }
-
 }
 
 
@@ -193,28 +376,35 @@ function loop(time) { // eslint-disable-line no-unused-vars
 
   for (var i in layer2) {
     var planet2 = layer2[i];
+    // planet2.position.set(
+    //   radius2 * Math.cos(theta * (2/(i+1))),
+    //   0,
+    //   radius2 * Math.sin(theta * (2/(i+1)))
+    // );
+    var pos2 = orbitCalculation2(radius2, i+1);
     planet2.position.set(
-      radius2 * Math.cos(theta * (2/(i+1))),
+      pos2.x,
       0,
-      radius2 * Math.sin(theta * (2/(i+1)))
+      pos2.z
     );
   }
 
   for (var u in layer3) {
     var planet3 = layer3[u];
+
+    var pos3 = orbitCalculation(radius3, u+1);
     planet3.position.set(
-      radius3 * Math.cos(theta * (2/(u+1))),
+      pos3.x,
       0,
-      radius3 * Math.sin(theta * (2/(u+1)))
+      pos3.z
     );
   }
 
-
-  //Increment theta, and update moon x and y
-  //position based off new theta value
   light.position.x = r * Math.cos(theta);
   light.position.y = 0;
   light.position.z = r * Math.sin(theta);
+
+  updateConnections();
 
   requestAnimationFrame( loop );
   renderer.render( scene, camera );
