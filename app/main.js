@@ -10,7 +10,7 @@ const H = 800;
 let renderer, scene, camera;
 let controls; // eslint-disable-line no-unused-vars
 // let elements = [];
-let numberElements = 200;
+let numberElements = 800;
 let elementSize = 0.2;
 let radiusScale = 0.4;
 let maxRadius = 8;
@@ -137,7 +137,7 @@ export function createElements(){
           color: planetColors[type],
           shading: THREE.FlatShading,
           wireframe: false,
-          specular: 0xff0000,
+          specular: 0xffffff,
           // transparent: true,
           // opacity: 0.8,
           shininess: 100,
