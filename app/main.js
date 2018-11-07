@@ -261,10 +261,12 @@ function updateConnections(){
   var cylinder = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1,  pointA.distanceTo( pointB )), material);
   cylinder.position.x = (pointA.x + pointB.x)/2;
   cylinder.position.z = (pointA.z + pointB.z)/2;
+
+  var vectorAB = new THREE.Vector3(pointB.x - pointA.x, pointB.y - pointA.y, pointB.z - pointA.z);
   // cylinder.rotation.set(new THREE.Vector3( 0, Math.PI / 2, 0));
-  var focalPoint = new THREE.Vector3( x2, y2, z2 );
+  // var focalPoint = new THREE.Vector3( x2, y2, z2 );
   cylinder.up = new THREE.Vector3(1,0,1);//Z axis up
-  cylinder.lookAt(focalPoint);
+  cylinder.lookAt(vectorAB);
   cylinder.name = "cylinder1";
 
   scene.add( cylinder );
